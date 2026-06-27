@@ -1,0 +1,6 @@
+@project_cvrde_HostAddress = http://localhost:5093
+
+GET {{project_cvrde_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

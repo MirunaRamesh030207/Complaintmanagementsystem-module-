@@ -1,0 +1,505 @@
+﻿@using project_cvrde.Models
+@model List<Complaint>
+
+@{
+    ViewData["Title"] = "Complaint Management";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+
+    <title>Complaint Management</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-4">
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+
+            @TempData["Success"]
+
+            <button class="btn-close"
+                    data-bs-dismiss="alert"></button>
+
+        </div>
+    }
+
+    <!-- HEADER -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold text-primary">
+
+                Complaint Management System
+
+            </h2>
+
+            <p class="text-muted">
+
+                Employee Complaint Dashboard
+
+            </p>
+
+        </div>
+
+        <a href="/Complaints/Create"
+           class="btn btn-success btn-lg">
+
+            + Add Complaint
+
+        </a>
+
+    </div>
+
+    <!-- DASHBOARD CARDS -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center">
+
+                    <h6>Total Complaints</h6>
+
+                    <h2 class="text-primary">
+
+                        @Model.Count
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center">
+
+                    <h6>Open</h6>
+
+                    <h2 class="text-danger">
+
+                        @Model.Count(x=>x.Status=="Open")
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center">
+
+                    <h6>Resolved</h6>
+
+                    <h2 class="text-success">
+
+                        @Model.Count(x=>x.Status=="Resolved")
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center">
+
+                    <h6>In Progress</h6>
+
+                    <h2 class="text-warning">
+
+                        @Model.Count(x=>x.Status=="In Progress")
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SEARCH -->
+
+    <div class="card shadow mb-4">
+
+        <div class="card-body">
+
+            <form method="get">
+
+                <div class="row">
+
+                    <div class="col-md-5">
+
+                        <input class="form-control"
+                               name="search"
+                               value="@ViewBag.Search"
+                               placeholder="Search Employee / Department / Description" />
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <select class="form-select"
+                                name="status">
+
+                            <option value="">All Status</option>
+
+                            <option value="Open">Open</option>
+
+                            <option value="In Progress">In Progress</option>
+
+                            <option value="Resolved">Resolved</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <button class="btn btn-primary w-100">
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <a href="/Complaints"
+                           class="btn btn-secondary w-100">
+
+                            Reset
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- COMPLAINT TABLE -->
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+
+            <h5>
+
+                Complaint List
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-hover table-bordered align-middle">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Employee</th>
+
+                        <th>Department</th>
+
+                        <th>Description</th>
+
+                        <th>Raised</th>
+
+                        <th>Expected</th>
+
+                        <th>Status</th>
+
+                        <th>Priority</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var complaint in Model)
+                            {
+                                <tr>
+
+                                    <td>@complaint.ComplaintID</td>
+
+                                    <td>@complaint.EmployeeID</td>
+
+                                    <td>@complaint.DepartmentID</td>
+
+                                    <td>@complaint.ComplaintDescription</td>
+
+                                    <td>@complaint.RaisedDate.ToShortDateString()</td>
+
+                                    <td>@complaint.ExpectedResolutionDate.ToShortDateString()</td>
+
+                                    <td>
+
+                                        @if (complaint.Status == "Open")
+                                        {
+                                            <span class="badge bg-danger">
+                                                Open
+                                            </span>
+                                        }
+                                        else if (complaint.Status == "Resolved")
+                                        {
+                                            <span class="badge bg-success">
+                                                Resolved
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                In Progress
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <td>
+
+                                        @if (complaint.Priority == "High")
+                                        {
+                                            <span class="badge bg-danger">
+                                                High
+                                            </span>
+                                        }
+                                        else if (complaint.Priority == "Medium")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Medium
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">
+                                                Low
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <td>
+
+                                        <a href="/Complaints/Details/@complaint.ComplaintID"
+                                           class="btn btn-info btn-sm">
+
+                                            View
+
+                                        </a>
+
+                                        <a href="/Complaints/Edit/@complaint.ComplaintID"
+                                           class="btn btn-warning btn-sm">
+
+                                            Edit
+
+                                        </a>
+
+                                        <a href="/Complaints/Delete/@complaint.ComplaintID"
+                                           class="btn btn-danger btn-sm">
+
+                                            Delete
+
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="9" class="text-center">
+
+                                    No Complaints Found
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <br />
+
+        <!-- CHARTS -->
+
+        <div class="row mt-4">
+
+            <div class="col-md-6">
+
+                <div class="card shadow">
+
+                    <div class="card-header bg-primary text-white">
+
+                        Complaint Status
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <canvas id="statusChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <div class="card shadow">
+
+                    <div class="card-header bg-success text-white">
+
+                        Priority Distribution
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <canvas id="priorityChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+            new Chart(document.getElementById("statusChart"), {
+
+                type: 'pie',
+
+                data: {
+
+                    labels: [
+
+                        'Open',
+
+                        'Resolved',
+
+                        'In Progress'
+
+                    ],
+
+                    datasets: [{
+
+                        data: [
+
+                            @Model.Count(x => x.Status == "Open"),
+
+                            @Model.Count(x => x.Status == "Resolved"),
+
+                            @Model.Count(x => x.Status == "In Progress")
+
+                        ]
+
+                    }]
+
+                }
+
+            });
+
+            new Chart(document.getElementById("priorityChart"), {
+
+                type: 'bar',
+
+                data: {
+
+                    labels: [
+
+                        'High',
+
+                        'Medium',
+
+                        'Low'
+
+                    ],
+
+                    datasets: [{
+
+                        label: 'Complaints',
+
+                        data: [
+
+                            @Model.Count(x => x.Priority == "High"),
+
+                            @Model.Count(x => x.Priority == "Medium"),
+
+                            @Model.Count(x => x.Priority == "Low")
+
+                        ]
+
+                    }]
+
+                }
+
+            });
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
